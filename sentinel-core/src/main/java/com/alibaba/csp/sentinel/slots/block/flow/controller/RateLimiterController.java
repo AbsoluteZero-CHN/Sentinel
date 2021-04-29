@@ -56,9 +56,11 @@ public class RateLimiterController implements TrafficShapingController {
 
         long currentTime = TimeUtil.currentTimeMillis();
         // Calculate the interval between every two requests.
+        // TODO 这里是计算请求期望的间隔时间, 比如我这设置的是 20qps, 那么间隔时间就是 1000ms / 20 = 50ms
         long costTime = Math.round(1.0 * (acquireCount) / count * 1000);
 
         // Expected pass time of this request.
+        // TODO 当前请求预期到达时间
         long expectedTime = costTime + latestPassedTime.get();
 
         if (expectedTime <= currentTime) {
@@ -69,6 +71,7 @@ public class RateLimiterController implements TrafficShapingController {
             // Calculate the time to wait.
             long waitTime = costTime + latestPassedTime.get() - TimeUtil.currentTimeMillis();
             if (waitTime > maxQueueingTimeMs) {
+                // TODO 预期的等待时间超过预设的超时时间, 触发限流
                 return false;
             } else {
                 long oldTime = latestPassedTime.addAndGet(costTime);
